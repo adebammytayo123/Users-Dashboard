@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import
-{ faSearch, faUsers, faMale, faFemale, faCaretDown, faEnvelope, faPhoneVolume, faArrowRight, faAngleLeft, faAngleRight }
+import { faSearch, faUsers, faMale, faFemale, faCaretDown, faEnvelope, faPhoneVolume, faArrowRight, faAngleLeft, faAngleRight }
     from "@fortawesome/free-solid-svg-icons";
 import styled from 'styled-components';
-import { getAllUsers } from "../state/actions/users";
+import { filterByGender, getAllUsers } from "../state/actions/users";
 
 import Switch from "react-switch";
 
@@ -21,14 +20,9 @@ const Users = () => {
     const [input, setInput] = useState("");
     const [userPerPage] = useState(3);
     const [activeButton, setActiveButton] = useState("");
-    const [resultsCopy, setResultsCopy] = useState("");
-    const [searchParameter] = useState("name");
 
 
-    const { persons } = useSelector((state) => state.users)
-
-
-
+    const { results, single_gender } = useSelector((state) => state.users)
 
 
     useEffect(() => {
@@ -36,40 +30,26 @@ const Users = () => {
     }, [dispatch])
 
 
-    const handleBtns = () => {
-        let resultsCopy;
-        if (activeTab === "all-users") {
-            resultsCopy =  persons
+    const handleBtns = (val) => {
+        setActiveTab(val)
+        if (val === "male-users") {
+            dispatch(filterByGender('male'))
         }
-        else if (activeTab === "male-users") {
-            resultsCopy = persons.filter((user) =>
-                user?.gender?.toLowerCase() === "male"
-            )
+        else if (val === "female-users") {
+            dispatch(filterByGender('female'))
         }
-        else if (activeTab === "female-users") {
-            resultsCopy = persons.filter((user) =>
-                user?.gender?.toLowerCase() === "female"
-            )
-        }
-        setResultsCopy(resultsCopy)
     }
-    // console.log(resultsCopy)
-
     const indexOfLastUser = currentPage * userPerPage;
     const indexOfFirstUser = indexOfLastUser - userPerPage;
-    const totalPages = persons.length
+    const totalPages = results.length;
 
-    const currentUsers = resultsCopy?.slice(indexOfFirstUser, indexOfLastUser);
-    console.log(currentUsers)
-
-    const nameFilter = persons.filter((user) =>
-        user[searchParameter].first?.toLowerCase().includes(input)
-    )
+    const allResults = results.slice(indexOfFirstUser, indexOfLastUser)
 
     const indexOfLastUsers = currentPage * userPerPage;
     const indexOfFirstUsers = indexOfLastUser - userPerPage;
 
-    const currentNameUsers = nameFilter.slice(indexOfFirstUsers, indexOfLastUsers);
+    const genderResults = single_gender.slice(indexOfFirstUsers, indexOfLastUsers)
+
 
     const handleNameInput = (e) => {
         setInput(e.target.value)
@@ -90,7 +70,7 @@ const Users = () => {
     }
 
 
-    
+
     const handleChange = (checked) => {
         setChecked(checked)
     }
@@ -123,10 +103,8 @@ const Users = () => {
                         <div className="wrap">
                             <button
                                 className="users"
-                                onClick={() => {
-                                    setActiveTab("all-users")
-                                    handleBtns()
-                                }}
+                                onClick={() =>
+                                    handleBtns('all-users')}
                             >
                                 <FontAwesomeIcon
                                     icon={faUsers}
@@ -138,10 +116,7 @@ const Users = () => {
                         <div className="wrap">
                             <button
                                 className="male"
-                                onClick={() => {
-                                    setActiveTab("male-users")
-                                    handleBtns()
-                                }}
+                                onClick={() => handleBtns('male-users')}
                             >
                                 <FontAwesomeIcon
                                     icon={faMale}
@@ -153,10 +128,8 @@ const Users = () => {
                         <div className="wrap">
                             <button
                                 className="female"
-                                onClick={() => {
-                                    setActiveTab("female-users")
-                                    handleBtns()
-                                }}
+                                onClick={() =>
+                                    handleBtns('female-users')}
                             >
                                 <FontAwesomeIcon
                                     icon={faFemale}
@@ -169,16 +142,16 @@ const Users = () => {
                 </div>
             </div>
             <div className="second-section col-sm-12 col-lg-6">
-            <>
-            {" "}
-               {activeTab === "male-users" ? (
-               <h3>Male Users</h3>
-            ) : activeTab === "female-users" ? (
-               <h3>Female Users</h3>
-            ) : (
-            <h3>All Users</h3>
-            )}
-           </>
+                <>
+                    {" "}
+                    {activeTab === "male-users" ? (
+                        <h3>Male Users</h3>
+                    ) : activeTab === "female-users" ? (
+                        <h3>Female Users</h3>
+                    ) : (
+                                <h3>All Users</h3>
+                            )}
+                </>
                 <div className="reduce mt-3">
                     <p>Filter by</p>
                     <div className="filter-by">
@@ -212,15 +185,15 @@ const Users = () => {
 
                     </div>
                 </div>
-                {(searchParameter === "name" ? currentNameUsers : currentUsers).map(person => (
-                    <div className="row">
-                        <div className="col-12">
+                <div className="row">
+                    {(activeTab === "all-users" ? allResults : activeTab !== "all-users" ? genderResults : null).map(result => (
+                        <div className="col-12" key={result.phone}>
                             <div className="card my-3 pl-3 py-3">
                                 <div className="minicard">
-                                    <img src={person.picture.medium} alt="" />
+                                    <img src={result.picture.medium} alt="" />
                                     <div className="info">
-                                        <h5>{person.name.first} {person.name.last}</h5>
-                                        <p>{person.location.street.number} {person.location.street.name}, {person.location.city}, {person.location.state}</p>
+                                        <h5>{result.name.first} {result.name.last}</h5>
+                                        <p>{result.location.street.number} {result.location.street.name}, {result.location.city}, {result.location.state}</p>
                                         <div className="contact-info">
                                             <div className="contact">
                                                 <p className="email">
@@ -229,7 +202,7 @@ const Users = () => {
                                                             className="envelope"
                                                             icon={faEnvelope}
                                                         />
-                                                    </span>{person.email}
+                                                    </span>{result.email}
                                                 </p>
                                                 <p className="phone">
                                                     <span className="mr-2">
@@ -237,16 +210,16 @@ const Users = () => {
                                                             className="phone"
                                                             icon={faPhoneVolume}
                                                         />
-                                                    </span>{person.phone}
+                                                    </span>{result.phone}
                                                 </p>
                                             </div>
                                             <div className="info">
-                                            <button>
-                                                <FontAwesomeIcon
-                                                    className="right"
-                                                    icon={faArrowRight}
-                                                />
-                                            </button>
+                                                <button>
+                                                    <FontAwesomeIcon
+                                                        className="right"
+                                                        icon={faArrowRight}
+                                                    />
+                                                </button>
                                             </div>
                                         </div>
 
@@ -254,14 +227,14 @@ const Users = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                ))
-                }
+                    ))
+                    }
+                </div>
                 <div className="bottom d-flex justify-content-between">
                     <button>button</button>
                     <div className="prev-next">
                         <button
-                            
+
                             onClick={() => {
                                 decrement()
                                 setActiveButton("previous")
@@ -273,12 +246,12 @@ const Users = () => {
                             />
                         </button>
                         <button
-                            
+
                             onClick={() => {
                                 increment()
                                 setActiveButton("next-btn")
                             }}
-                            className={activeButton ==="next-btn" ? "active1" : "next"}
+                            className={activeButton === "next-btn" ? "active1" : "next"}
                         >
                             <FontAwesomeIcon
                                 icon={faAngleRight}
