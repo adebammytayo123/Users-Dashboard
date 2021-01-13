@@ -3,8 +3,6 @@ import * as types from "../actionType/users";
 
 const initialState = {
   persons: [],
-  maleUsers: [],
-  femaleUsers: [],
 };
 
 export default function bodyReducer(state = initialState, action) {
@@ -14,18 +12,6 @@ export default function bodyReducer(state = initialState, action) {
         ...state,
         persons: [...action.payload]
       };
-      case types.MALE_USERS:
-        return {
-          ...state,
-          maleUsers: action.payload
-      };
-      case types.FEMALE_USERS:
-        return {
-          ...state,
-          femaleUsers: action.payload
-        };
-  
-  
    
     default:
       return state;

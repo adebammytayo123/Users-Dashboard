@@ -5,11 +5,8 @@ import
 { faSearch, faUsers, faMale, faFemale, faCaretDown, faEnvelope, faPhoneVolume, faArrowRight, faAngleLeft, faAngleRight }
     from "@fortawesome/free-solid-svg-icons";
 import styled from 'styled-components';
-import { getAllUsers, getUsersByGender } from "../state/actions/users";
+import { getAllUsers } from "../state/actions/users";
 
-// import { useFormik } from "formik";
-// import * as Yup from "yup";
-// import { CountryDropdown } from "react-country-region-selector";
 import Switch from "react-switch";
 
 
@@ -21,10 +18,15 @@ const Users = () => {
     const [checked, setChecked] = useState(false);
     const [activeTab, setActiveTab] = useState("all-users");
     const [currentPage, setCurrentPage] = useState(1);
+    const [input, setInput] = useState("");
     const [userPerPage] = useState(3);
     const [activeButton, setActiveButton] = useState("");
+    const [resultsCopy, setResultsCopy] = useState("");
+    const [searchParameter] = useState("name");
 
-    const { persons, maleUsers, femaleUsers } = useSelector((state) => state.users)
+
+    const { persons } = useSelector((state) => state.users)
+
 
 
 
@@ -33,21 +35,45 @@ const Users = () => {
         dispatch(getAllUsers())
     }, [dispatch])
 
-    useEffect(() => {
-        if (activeTab === "male-users") {
-            dispatch(getUsersByGender('male'))
+
+    const handleBtns = () => {
+        let resultsCopy;
+        if (activeTab === "all-users") {
+            resultsCopy =  persons
+        }
+        else if (activeTab === "male-users") {
+            resultsCopy = persons.filter((user) =>
+                user?.gender?.toLowerCase() === "male"
+            )
         }
         else if (activeTab === "female-users") {
-            dispatch(getUsersByGender('female'))
+            resultsCopy = persons.filter((user) =>
+                user?.gender?.toLowerCase() === "female"
+            )
         }
-    }, [dispatch, activeTab]);
-
+        setResultsCopy(resultsCopy)
+    }
+    // console.log(resultsCopy)
 
     const indexOfLastUser = currentPage * userPerPage;
     const indexOfFirstUser = indexOfLastUser - userPerPage;
     const totalPages = persons.length
 
-    const currentUsers = persons.slice(indexOfFirstUser, indexOfLastUser);
+    const currentUsers = resultsCopy?.slice(indexOfFirstUser, indexOfLastUser);
+    console.log(currentUsers)
+
+    const nameFilter = persons.filter((user) =>
+        user[searchParameter].first?.toLowerCase().includes(input)
+    )
+
+    const indexOfLastUsers = currentPage * userPerPage;
+    const indexOfFirstUsers = indexOfLastUser - userPerPage;
+
+    const currentNameUsers = nameFilter.slice(indexOfFirstUsers, indexOfLastUsers);
+
+    const handleNameInput = (e) => {
+        setInput(e.target.value)
+    }
 
     // Next Page
     const increment = () => {
@@ -85,6 +111,8 @@ const Users = () => {
                     />
                     <input
                         type="text"
+                        value={input}
+                        onChange={handleNameInput}
                         placeholder=" Find a user"
                     />
 
@@ -97,6 +125,7 @@ const Users = () => {
                                 className="users"
                                 onClick={() => {
                                     setActiveTab("all-users")
+                                    handleBtns()
                                 }}
                             >
                                 <FontAwesomeIcon
@@ -111,6 +140,7 @@ const Users = () => {
                                 className="male"
                                 onClick={() => {
                                     setActiveTab("male-users")
+                                    handleBtns()
                                 }}
                             >
                                 <FontAwesomeIcon
@@ -125,6 +155,7 @@ const Users = () => {
                                 className="female"
                                 onClick={() => {
                                     setActiveTab("female-users")
+                                    handleBtns()
                                 }}
                             >
                                 <FontAwesomeIcon
@@ -138,7 +169,16 @@ const Users = () => {
                 </div>
             </div>
             <div className="second-section col-sm-12 col-lg-6">
-                <h3>All Users</h3>
+            <>
+            {" "}
+               {activeTab === "male-users" ? (
+               <h3>Male Users</h3>
+            ) : activeTab === "female-users" ? (
+               <h3>Female Users</h3>
+            ) : (
+            <h3>All Users</h3>
+            )}
+           </>
                 <div className="reduce mt-3">
                     <p>Filter by</p>
                     <div className="filter-by">
@@ -172,7 +212,7 @@ const Users = () => {
 
                     </div>
                 </div>
-                {activeTab === "all-users" && (currentUsers.map(person => (
+                {(searchParameter === "name" ? currentNameUsers : currentUsers).map(person => (
                     <div className="row">
                         <div className="col-12">
                             <div className="card my-3 pl-3 py-3">
@@ -216,93 +256,7 @@ const Users = () => {
                         </div>
                     </div>
                 ))
-                )}
-                {/* {activeTab === "male-users" && (maleUsers.map(person => (
-                    <div className="row">
-                        <div className="col-12">
-                            <div className="card my-3 pl-3 py-3">
-                                <div className="minicard">
-                                    <img src={person.picture.medium} alt="" />
-                                    <div className="info">
-                                        <h5>{person.name.first} {person.name.last}</h5>
-                                        <p>{person.location.street.number} {person.location.street.name}, {person.location.city}, {person.location.state}</p>
-                                        <div className="contact-button">
-                                            <div className="contact-info">
-                                                <p>
-                                                    <span className="mr-2">
-                                                        <FontAwesomeIcon
-                                                            className="envelope"
-                                                            icon={faEnvelope}
-                                                        />
-                                                    </span>{person.email}
-                                                </p>
-                                                <p>
-                                                    <span>
-                                                        <FontAwesomeIcon
-                                                            className="phone"
-                                                            icon={faPhoneVolume}
-                                                        />
-                                                    </span>{person.phone}
-                                                </p>
-                                            </div>
-                                            <button>
-                                                <FontAwesomeIcon
-                                                    className="right"
-                                                    icon={faArrowRight}
-                                                />
-                                            </button>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))
-                )}
-                {activeTab === "female-users" && (femaleUsers.map(person => (
-                    <div className="row">
-                        <div className="col-12">
-                            <div className="card my-3 pl-3 py-3">
-                                <div className="minicard">
-                                    <img src={person.picture.medium} alt="" />
-                                    <div className="info">
-                                        <h5>{person.name.first} {person.name.last}</h5>
-                                        <p>{person.location.street.number} {person.location.street.name}, {person.location.city}, {person.location.state}</p>
-                                        <div className="contact-button">
-                                            <div className="contact-info">
-                                                <p>
-                                                    <span className="mr-2">
-                                                        <FontAwesomeIcon
-                                                            className="envelope"
-                                                            icon={faEnvelope}
-                                                        />
-                                                    </span>{person.email}
-                                                </p>
-                                                <p>
-                                                    <span>
-                                                        <FontAwesomeIcon
-                                                            className="phone"
-                                                            icon={faPhoneVolume}
-                                                        />
-                                                    </span>{person.phone}
-                                                </p>
-                                            </div>
-                                            <button>
-                                                <FontAwesomeIcon
-                                                    className="right"
-                                                    icon={faArrowRight}
-                                                />
-                                            </button>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ))
-                )} */}
+                }
                 <div className="bottom d-flex justify-content-between">
                     <button>button</button>
                     <div className="prev-next">
