@@ -19,7 +19,6 @@ export const filterByGender = (payload) => {
 export const getAllUsers = () => async (dispatch) => {
   await axios.get(`https://randomuser.me/api/?results=50`)
     .then(({ data }) => {
-      console.log("dataaaa", data.results)
       dispatch(getUsers(data.results))
     })
     .catch((err) => {

@@ -82,7 +82,7 @@ const Users = () => {
                         <h1 className="heading1">Hello,</h1>
                         <h1 className="heading2 pl-1"> Emerald </h1>
                     </div>
-                    <p>Welcome to your dashboard, kindly sort through the user base</p>
+                    <p data-testid="welcome-message">Welcome to your dashboard, kindly sort through the user base</p>
                 </div>
                 <form className="input-search">
                     <FontAwesomeIcon
@@ -103,6 +103,7 @@ const Users = () => {
                         <div className="wrap">
                             <button
                                 className="users"
+                                data-testid='users'
                                 onClick={() =>
                                     handleBtns('all-users')}
                             >
