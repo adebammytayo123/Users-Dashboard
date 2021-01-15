@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import { render, cleanup, fireEvent } from '@testing-library/react';
 import Users from './Users'
 import store from "../../src/store";
+import { filterByGender } from '../state/actions/users';
 
 afterEach(cleanup);
 
@@ -23,10 +24,11 @@ it('should test on chnage', () => {
 });
 
 
-it('should filter by name',  () => {
+it('should filter by name', () => {
     const { getByTestId } = render(<Provider store={store}><Users /></Provider>);
     const filterInput = getByTestId('filter-input')
-    console.log('filter', filterInput)
-     fireEvent.change(filterInput, { target: { value: 'hd' } })
 
+    fireEvent.change(filterInput, { target: { value: 'hd' } })
+    expect(filterInput.value).toEqual('hd')
+    console.log('filter', filterInput.value)
 });

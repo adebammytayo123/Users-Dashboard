@@ -7,13 +7,13 @@ import {
     faEnvelope, faPhoneVolume,
     faArrowRight, faAngleLeft,
     faAngleRight, faCloudDownloadAlt,
-    faMobileAlt, faArrowLeft
 }
     from "@fortawesome/free-solid-svg-icons";
 import styled from 'styled-components';
 import { filterByGender, getAllUsers, filterByName, setDetails } from "../state/actions/users";
 
 import Switch from "react-switch";
+import SingleUser from "./SingleUser";
 
 
 
@@ -27,11 +27,10 @@ const Users = () => {
     const [input, setInput] = useState("");
     const [activeButton, setActiveButton] = useState("");
     const [show, setShow] = useState(false);
-    // const [activeUser, setActiveUser] = useState("");
 
 
 
-    const { results, single_gender, users_by_name, details } = useSelector((state) => state.users)
+    const { results, single_gender, users_by_name } = useSelector((state) => state.users)
     const userPerPage = 3
 
     useEffect(() => {
@@ -82,10 +81,7 @@ const Users = () => {
         setShow(!show)
     };
 
-    const backToResults = () => {
-        // dispatch(dispatch(getAllUsers()))
-        setShow(show)
-    }
+
 
     const handleChange = (checked) => {
         setChecked(checked)
@@ -139,7 +135,7 @@ const Users = () => {
                 <div className="show-users my-5">
                     <h6 className="users">Show Users</h6>
                     <div className="filter-icons py-3">
-                        <section className={activeTab ==="all-users" ? "activeTab" : ""}>
+                        <section className={activeTab === "all-users" ? "activeTab" : ""}>
                             <button
                                 className="users"
                                 data-testid='users'
@@ -147,31 +143,34 @@ const Users = () => {
                                     handleBtns('all-users')}
                             >
                                 <FontAwesomeIcon
+                                    className="all-icon"
                                     icon={faUsers}
                                     style={{ fontSize: "30px" }}
                                 />
                             </button>
                             <p className="title">All Users</p>
                         </section>
-                        <section className={activeTab ==="male-users" ? "activeTab" : ""}>
+                        <section className={activeTab === "male-users" ? "activeTab" : ""}>
                             <button
                                 className="male"
                                 onClick={() => handleBtns('male-users')}
                             >
                                 <FontAwesomeIcon
+                                    className="male-icon"
                                     icon={faMale}
                                     style={{ fontSize: "40px" }}
                                 />
                             </button>
                             <p className="title">Male Users</p>
                         </section>
-                        <section className={activeTab ==="female-users" ? "activeTab" : ""}>
+                        <section className={activeTab === "female-users" ? "activeTab" : ""}>
                             <button
                                 className="female"
                                 onClick={() =>
                                     handleBtns('female-users')}
                             >
                                 <FontAwesomeIcon
+                                    className="female-icon"
                                     icon={faFemale}
                                     style={{ fontSize: "40px" }}
                                 />
@@ -277,55 +276,7 @@ const Users = () => {
                         ))
                         }
                     </div>
-                ) : (
-                        <div className="row py-5">
-                            <div className="col-12">
-                                <button
-                                    onClick={() =>
-                                        backToResults()
-                                    }
-                                    className="back">
-                                    <FontAwesomeIcon
-                                        className="left"
-                                        icon={faArrowLeft}
-                                    />
-                                    RESULTS
-                                </button>
-                                <div className="box d-flex py-5">
-                                    <img src={details?.picture?.large} alt="" />
-                                    <div className="info my-3">
-                                        <h4> {details?.name?.title} {details?.name?.first}, {details?.name?.last}, <span>{details?.dob?.age}</span></h4>
-                                        <p>{details?.location?.street?.number} {details?.location?.street?.name} {details?.location?.city} {details?.location?.state}</p>
-                                        <p className="email pl-3 mr-5">
-                                            <span className="mr-2">
-                                                <FontAwesomeIcon
-                                                    className="envelope"
-                                                    icon={faEnvelope}
-                                                />
-                                            </span>{details.email}
-                                        </p>
-                                        <p className="joined pl-3">JOINED: {details?.registered?.date}</p>
-                                        <p className="phone">
-                                            <span className="mr-2">
-                                                <FontAwesomeIcon
-                                                    className="phone"
-                                                    icon={faPhoneVolume}
-                                                />
-                                            </span>{details.phone}
-                                        </p>
-                                        <p className="phone">
-                                            <span className="mr-2">
-                                                <FontAwesomeIcon
-                                                    className="phone"
-                                                    icon={faMobileAlt}
-                                                />
-                                            </span>{details.phone}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                ) : (<SingleUser setShow={setShow} />)}
 
 
                 <div className="bottom d-flex justify-content-between my-5">
@@ -341,7 +292,7 @@ const Users = () => {
                         />
                         Download results
                         </button>
-                    <div className="prev-next">
+                    {!show && <div className="prev-next">
                         <button
 
                             onClick={() => {
@@ -366,7 +317,7 @@ const Users = () => {
                                 icon={faAngleRight}
                             />
                         </button>
-                    </div>
+                    </div>}
                 </div>
             </div>
         </UserContainer>
@@ -378,6 +329,7 @@ const UserContainer = styled.div`
   width: 100%;
   display: flex;
   justify-content: space-between;
+  overflow: hidden;
   .first-section {
       padding: 10rem 5rem 2rem 5rem;
       .welcome {
@@ -407,6 +359,9 @@ const UserContainer = styled.div`
           border-radius: 15px;
           padding: 0.8rem 1rem;
           margin-top: 2rem;
+          @media (max-width: 1300px) {
+              width: 100%;
+          }
           input {
             font-family: SemiBold;
             background: none !important;
@@ -436,6 +391,9 @@ const UserContainer = styled.div`
           justify-content: space-between;
           margin-top: 1rem;
           align-items: center;
+          @media (max-width: 1300px) {
+              width: 100%;
+          }
           section {
             transition: all 1s linear;
             &.activeTab {
@@ -451,7 +409,23 @@ const UserContainer = styled.div`
               outline: none;
               height: 70px;
               opacity: 1;
-          }
+              @media (max-width: 400px) {
+              width: 50px;
+              height: 50px;
+              }
+              @media (max-width: 500px) {
+              width: 50px;
+              height: 50px;
+              }
+              .all-icon {
+                @media (max-width: 400px) {
+              font-size: 20px;
+              }
+              @media (max-width: 500px) {
+                font-size: 20px;
+              }
+              }
+            }
           .male {
               background: var(--mainGreen);
               color: #FFFFFF;
@@ -461,6 +435,22 @@ const UserContainer = styled.div`
               outline: none;
               height: 70px;
               opacity: 1;
+              @media (max-width: 400px) {
+              width: 50px;
+              height: 50px;
+              }
+              @media (max-width: 500px) {
+              width: 50px;
+              height: 50px;
+              }
+              .male-icon {
+                @media (max-width: 400px) {
+              font-size: 20px;
+              }
+              @media (max-width: 500px) {
+                font-size: 20px;
+              }
+              }
           }
           .female {
               background: var(--fairPurple);
@@ -471,6 +461,22 @@ const UserContainer = styled.div`
               height: 70px;
               outline: none;
               opacity: 1;
+              @media (max-width: 400px) {
+              width: 50px;
+              height: 50px;
+              }
+              @media (max-width: 500px) {
+              width: 50px;
+              height: 50px;
+              }
+              .female-icon {
+                @media (max-width: 400px) {
+              font-size: 20px;
+              }
+              @media (max-width: 500px) {
+                font-size: 20px;
+              }
+              }
           }
           .title {
              font-family: PoppinsMedium;
@@ -478,6 +484,12 @@ const UserContainer = styled.div`
              font-size: 10px;
              margin-top: 1rem;
              text-align: center;
+             @media (max-width: 400px) {
+              font-size: 10px;
+              }
+              @media (max-width: 500px) {
+                font-size: 10px;
+              }
           }
         }
     }
@@ -487,25 +499,65 @@ const UserContainer = styled.div`
         padding: 3rem;
         border-radius: 15px;
         width: 55%;
+        @media(max-width: 1200px) {
+            width: 70%;
+            padding: 0;
+        }
+        @media(max-width: 400px) {
+            width: 100%;
+            padding: 0;
+        }
+        @media(max-width: 500px) {
+            width: 100%;
+            padding: 0;
+        }
         h3 {
             font-family: PoppinsBold;
             color: var(--darkPurple);
             opacity: 1; 
+            @media (max-width: 400px) {
+                margin-left: 1.5rem;
+                margin-top: 1rem;
+            }
+            @media (max-width: 500px) {
+                margin-left: 1.5rem;
+                margin-top: 1rem;
+            }
         }
         p {
             opacity: 0.9; 
             color: var(--darkPurple);
             font-family: PoppinsLight; 
+            @media (max-width: 400px) {
+                margin-left: 1.5rem;
+            }
+            @media (max-width: 500px) {
+                margin-left: 1.5rem;
+            }
         }
         .filter-by {
             display: flex;
             justify-content: space-between;
             margin-top: -2rem;
+            @media(max-width: 400px) {
+              display: block;
+              margin-left: 1.5rem;
+            }
+            @media(max-width: 500px) {
+              display: block;
+              margin-left: 1.5rem;
+            }
         }
         .form {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            @media(max-width: 400px) {
+              display: block;
+            }
+            @media(max-width: 500px) {
+              display: block;
+            }
         }
         .list-search {
           position: relative;
@@ -517,6 +569,12 @@ const UserContainer = styled.div`
           color: var(--darkPurple) !important;
           margin-top: 2rem;
           margin-right: 1rem;
+          @media(max-width: 400px) {
+              margin-top: 3rem;
+            }
+            @media(max-width: 500px) {
+                margin-top: 3rem;
+            }
           input {
             position: absolute;
             top: 15px;
@@ -580,16 +638,28 @@ const UserContainer = styled.div`
                 font-size: 0.8rem;
             }
         }
-        .row {
-           /* transition: all 0.5s ease-in-out; */
-        }
         .card {
             height: 150px;
             border-radius: 10px;
-            /* transform: translateY(8em) rotateZ(20deg); */
             border: none;
+            @media (max-width: 400px) {
+                width: 340px;
+                height: 250px;
+                margin-left: 0.5rem;
+            }
+            @media (max-width: 500px) {
+                width: 340px;
+                height: 250px;
+                margin-left: 0.5rem;
+            }
             .minicard {
             display: flex;
+            @media (max-width: 400px) {
+                justify-content: space-between;
+            }
+            @media (max-width: 500px) {
+                justify-content: space-between;
+            }
             img {
                 width: 90px;
                 height: 90px;
@@ -599,34 +669,69 @@ const UserContainer = styled.div`
             .info {
                 display: block;
                 margin-left: 2rem;
+                @media (max-width: 400px) {
+                    margin-left: 1rem;
+                }
+                @media (max-width: 500px) {
+                    margin-left: 1rem;
+                }
                 h5 {
                     color: var(--darkPurple);
                     font-family: PoppinsBold;
                     opacity: 1;
+                    @media (max-width: 400px) {
+                        font-size: 14px;
+                    }
+                    @media (max-width: 500px) {
+                        font-size: 14px;
+                    }
                 }
                 p {
                     font-family: MediumItalic; 
                     color: var(--darkPurple);
                     opacity: 0.69;
                     font-size: 16px;
+                    @media (max-width: 400px) {
+                        font-size: 14px;
+                    }
+                    @media (max-width: 500px) {
+                        font-size: 14px;
+                    }
                 }
             }
             .contact-info {
                 display: flex;
+                @media (max-width: 400px) {
+                        display: block;
+                    }
+                    @media (max-width: 500px) {
+                        display: block;
+                    }
                 .contact {
                 display: flex;
+                @media (max-width: 400px) {
+                        display: block;
+                    }
+                    @media (max-width: 500px) {
+                        display: block;
+                    }
                 color: var(--darkPurple);
                 font-family: PoppinsLight;
                 .email {
                     font-size: 0.8rem;
-                    margin-right: 0.5rem
+                    margin-right: 0.5rem;
+                    @media (max-width: 400px) {
+                        margin-right: 0;
+                    }
+                    @media (max-width: 500px) {
+                        margin-right: 0;
+                    }
                 }
                 .phone {
                     font-size: 0.8rem;
                 }
             }
                .info {
-                   float: right;
                    button {
                     margin-top: -0.5rem;
                     width: 2.5rem;
@@ -635,61 +740,28 @@ const UserContainer = styled.div`
                     border: none;
                     border-radius: 10px;
                     color: #FFFFFF;
+                    @media (max-width: 400px) {
+                        margin-top: 0;
+                    }
+                    @media (max-width: 500px) {
+                        margin-top: 0;
+                    }
                 }
                }
             }
             
         }
         }
-        .back {
-            background: none;
-            border: none;
-            outline: none;
-            opacity: 1;
-            font-size: 14px;
-            color: var(--lightDark) !important;
-            .left {
-                color: var(--mainGreen);
-                margin-right: 0.6rem;
-                font-size: 1.2rem;
-                padding-top: 2px;
+        .bottom {
+            @media (max-width: 400px) {
+                display: block;
+                margin-left: 1.5rem;
+                margin-right: 1.5rem;
             }
-        }
-        .box {
-            img {
-                width: 160px;
-                height: 170px;
-                border-radius: 50%;
-                border: 5px solid var(--mainGreen);
-            }
-            .info{
-                margin-left: 2rem;
-                h4 {
-                    color: var(--darkPurple);
-                    font-family: PoppinsBold;
-                    opacity: 1;
-                    span {
-                        opacity: 0.4;
-                        font-weight: lighter;
-                    }
-                }
-                .email{
-                   background: var(--lighterWhite);
-                   padding: 0.5rem;
-                   border-radius: 30px;
-                   opacity: 1; 
-                }
-                .joined {
-                    background: var(--lightPink);
-                    border-radius: 30px;
-                    padding: 0.8rem;
-                    font-size: 12px;
-                    font-weight: bolder;
-                    margin-right: 7rem;
-                }
-                .phone {
-                    font-size: 12px;
-                }
+            @media (max-width: 500px) {
+                display: block;
+                margin-left: 1.5rem;
+                margin-right: 1.5rem;
             }
         }
         .download {
@@ -701,6 +773,13 @@ const UserContainer = styled.div`
             outline: none;
             color: #ffffff;
             font-size: 14px;
+            @media (max-width: 400px) {
+                width: 60%;
+                margin-left: 1.5rem;
+            }
+            @media (max-width: 500px) {
+                width: 60%;
+            }
         }
         .prev-next {
             display: flex;

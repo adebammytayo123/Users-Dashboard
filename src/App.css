@@ -20,11 +20,13 @@
 
 html {
   background: var(--darkPurple);
+  overflow-x: hidden;
 }
 
 
 body {
   background: var(--darkPurple);
+  overflow-x: hidden;
   width: 100%
 }
 
