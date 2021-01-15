@@ -89,11 +89,11 @@ const Users = () => {
 
     const exportToCvs = () => {
         var cvsRow = [];
-        var A = [["id", ["first name", "last name"]],]
+        var A = [["id", ["first name"]],]
         var re = results;
 
         for (var item = 0; item < results.length; item++) {
-            A.push([item, re[item].name.first], [item, re[item].name.last])
+            A.push([item, re[item].name.first])
         }
         for (var i = 0; i < A.length; ++i) {
             cvsRow.push(A[i].join(","))
