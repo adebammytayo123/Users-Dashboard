@@ -31,8 +31,7 @@ const Users = () => {
     const [country, setCountry] = useState("");
 
 
-
-    const { results, single_gender, users_by_name, users_by_country } = useSelector((state) => state.users)
+    const { results, single_gender, users_by_name, users_by_country, loading } = useSelector((state) => state.users)
     const userPerPage = 3
 
     useEffect(() => {
@@ -277,7 +276,7 @@ const Users = () => {
                                                                 </span>{result.phone}
                                                             </p>
                                                         </div>
-                                                        
+
                                                         <div className="info">
                                                             <button
                                                                 onClick={() => {
@@ -303,10 +302,11 @@ const Users = () => {
                                     </div>
                                 ))
                         }
-                        {activeTab === "all-users" && input.length === 0 && results.length === 0 && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
+                        {!loading && activeTab === "all-users" && input.length === 0 && results.length === 0 && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
                         {activeTab !== "all-users" && input.length === 0 && country.length === 0 && single_gender.length === 0 && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
                         {(input.length > 0 && users_by_name.length === 0) && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
                         {(country.length > 0 && users_by_country.length === 0) && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
+                        {loading && <h3 className="mx-auto my-5 font-italic">Loading users...</h3>}
                     </div>
                 ) : (<SingleUser setShow={setShow} setActiveTab={setActiveTab} />)}
 

@@ -7,6 +7,7 @@ const initialState = {
   users_by_name: [],
   users_by_country: [],
   details: {},
+  loading:true
 };
 
 export default function bodyReducer(state = initialState, action) {
@@ -46,13 +47,17 @@ export default function bodyReducer(state = initialState, action) {
           user.location.country?.toLowerCase()?.includes(action.payload?.toLowerCase())
         )
       }
-
-
       case types.SET_DETAILS:
         return {
           ...state,
           details: action.payload
         };
+    case types.LOADING: {
+      return {
+        ...state,
+        loading:action.payload
+      }
+        }
 
     default:
       return state;

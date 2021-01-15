@@ -36,12 +36,22 @@ export const setDetails = (payload) => {
   };
 };
 
+export const setLoading = (payload) => {
+  return {
+    type: types.LOADING,
+    payload,
+  };
+};
+
 export const getAllUsers = () => async (dispatch) => {
+  dispatch(setLoading(true))
   await axios.get(`https://randomuser.me/api/?results=50`)
     .then(({ data }) => {
+      dispatch(setLoading(false))
       dispatch(getUsers(data.results))
     })
     .catch((err) => {
+      dispatch(setLoading(false))
       return err;
     });
 };
