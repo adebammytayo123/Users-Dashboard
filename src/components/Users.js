@@ -531,17 +531,19 @@ const UserContainer = styled.div`
         padding: 3rem;
         border-radius: 15px;
         width: 55%;
-        @media(max-width: 1200px) {
+        @media(max-width: 1300px) {
             width: 70%;
             padding: 0;
         }
         @media(max-width: 400px) {
             width: 100%;
             padding: 0;
+            margin: 0;
         }
         @media(max-width: 500px) {
             width: 100%;
             padding: 0;
+            margin: 0;
         }
         h3 {
             font-family: PoppinsBold;
@@ -675,12 +677,12 @@ const UserContainer = styled.div`
             border-radius: 10px;
             border: none;
             @media (max-width: 400px) {
-                width: 340px;
+                width: 370px;
                 min-height: 200px;
                 margin-left: 0.5rem;
             }
             @media (max-width: 500px) {
-                width: 340px;
+                width: 370px;
                 min-height: 200px;
                 margin-left: 0.5rem;
             }
