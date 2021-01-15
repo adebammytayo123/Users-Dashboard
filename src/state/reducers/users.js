@@ -23,6 +23,7 @@ export default function bodyReducer(state = initialState, action) {
     
     case types.FILTER_BY_NAME:
       let newArr = []
+      // eslint-disable-next-line array-callback-return
       state.results.filter(user => {
         if (user.name.first.toLowerCase().includes(action.payload.toLowerCase())) {
           newArr.push(user)

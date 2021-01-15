@@ -16,7 +16,6 @@ it('should display welcome message', () => {
 });
 
 it('should test on chnage', () => {
-    const buttonClick = jest.fn()
     const { getByTestId } = render(<Provider store={store}><Users /></Provider>);
     const userPage = getByTestId('users')
     fireEvent.click(userPage)
@@ -25,7 +24,6 @@ it('should test on chnage', () => {
 
 
 it('should filter by name',  () => {
-    const onChange = jest.fn()
     const { getByTestId } = render(<Provider store={store}><Users /></Provider>);
     const filterInput = getByTestId('filter-input')
     console.log('filter', filterInput)

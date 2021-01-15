@@ -580,9 +580,13 @@ const UserContainer = styled.div`
                 font-size: 0.8rem;
             }
         }
+        .row {
+           /* transition: all 0.5s ease-in-out; */
+        }
         .card {
             height: 150px;
             border-radius: 10px;
+            /* transform: translateY(8em) rotateZ(20deg); */
             border: none;
             .minicard {
             display: flex;
