@@ -715,9 +715,11 @@ const UserContainer = styled.div`
                     opacity: 1;
                     @media (max-width: 400px) {
                         font-size: 14px;
+                        padding-right: 2rem;
                     }
                     @media (max-width: 500px) {
                         font-size: 14px;
+                        padding-right: 2rem;
                     }
                 }
                 p {
@@ -726,14 +728,17 @@ const UserContainer = styled.div`
                     opacity: 0.69;
                     font-size: 16px;
                     @media (max-width: 400px) {
+                        padding-right: 2rem;
                         font-size: 14px;
                     }
                     @media (max-width: 500px) {
+                        padding-right: 2rem;
                         font-size: 14px;
                     }
                 }
             }
             .contact-info {
+                padding-right: 2rem;
                 display: flex;
                 @media (max-width: 400px) {
                         display: block;
