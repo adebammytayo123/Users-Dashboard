@@ -5,6 +5,7 @@ const initialState = {
   results: [],
   single_gender: [],
   users_by_name: [],
+  users_by_country: [],
   details: {},
 };
 
@@ -37,6 +38,15 @@ export default function bodyReducer(state = initialState, action) {
         users_by_name: [...newArr]
 
       };
+    case types.FILTER_BY_COUNTRY:
+
+      return {
+        ...state,
+        users_by_country: state.results.filter(user => 
+          user.location.country?.toLowerCase()?.includes(action.payload?.toLowerCase())
+        )
+      }
+
 
       case types.SET_DETAILS:
         return {

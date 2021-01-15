@@ -23,6 +23,12 @@ export const filterByName = (payload) => {
     payload,
   };
 };
+export const filterByCountry = (payload) => {
+  return {
+    type: types.FILTER_BY_COUNTRY,
+    payload,
+  };
+};
 export const setDetails = (payload) => {
   return {
     type: types.SET_DETAILS,

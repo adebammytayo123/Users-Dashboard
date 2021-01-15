@@ -1,9 +1,4 @@
-import React from "react";
-import { Provider } from "react-redux";
-import { render, cleanup, fireEvent } from "@testing-library/react";
-import store from "../../store";
 
-afterEach(cleanup);
 const thunk = ({ dispatch, getState }) => (next) => (action) => {
   if (typeof action === "function") {
     return action(dispatch, getState);

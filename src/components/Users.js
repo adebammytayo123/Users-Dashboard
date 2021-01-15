@@ -3,16 +3,17 @@ import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faSearch, faUsers,
-    faMale, faFemale, faCaretDown,
+    faMale, faFemale,
     faEnvelope, faPhoneVolume,
     faArrowRight, faAngleLeft,
     faAngleRight, faCloudDownloadAlt,
 }
     from "@fortawesome/free-solid-svg-icons";
 import styled from 'styled-components';
-import { filterByGender, getAllUsers, filterByName, setDetails } from "../state/actions/users";
+import { filterByGender, getAllUsers, filterByName, setDetails, filterByCountry } from "../state/actions/users";
 
 import Switch from "react-switch";
+import { CountryDropdown } from "react-country-region-selector";
 import SingleUser from "./SingleUser";
 
 
@@ -27,10 +28,11 @@ const Users = () => {
     const [input, setInput] = useState("");
     const [activeButton, setActiveButton] = useState("");
     const [show, setShow] = useState(false);
+    const [country, setCountry] = useState("");
 
 
 
-    const { results, single_gender, users_by_name } = useSelector((state) => state.users)
+    const { results, single_gender, users_by_name, users_by_country } = useSelector((state) => state.users)
     const userPerPage = 3
 
     useEffect(() => {
@@ -39,6 +41,8 @@ const Users = () => {
 
 
     const handleBtns = (val) => {
+        setCountry('')
+        setInput("")
         setActiveTab(val)
         if (val === "male-users") {
             dispatch(filterByGender('male'))
@@ -82,7 +86,6 @@ const Users = () => {
     };
 
 
-
     const handleChange = (checked) => {
         setChecked(checked)
     };
@@ -108,6 +111,7 @@ const Users = () => {
         a.click();
         console.log(cvsString)
     }
+    console.log('users by ountry', users_by_country, activeTab.length === 0 && country.length > 0)
     return (
         <UserContainer className="row">
             <div className="first-section col-sm-12 col-lg-5">
@@ -187,9 +191,12 @@ const Users = () => {
                         <h3>Male Users</h3>
                     ) : activeTab === "female-users" ? (
                         <h3>Female Users</h3>
-                    ) : (
-                                <h3>All Users</h3>
-                            )}
+                    ) : activeTab === "user-info" ? (
+                        <h3> User List</h3>
+                    )
+                                : (
+                                    <h3>All Users</h3>
+                                )}
                 </>
                 <div className="reduce mt-3">
                     <p>Filter by</p>
@@ -207,14 +214,27 @@ const Users = () => {
                                 />
                             </div>
                             <div className="country-search">
-                                <input
-                                    type="text"
-                                    placeholder=" country"
+                                <CountryDropdown
+                                    style={{
+                                        width: "120px",
+                                        height: "50px",
+                                        border: "none",
+                                        background: "none",
+                                        outline: "none",
+                                        borderRadius: "14px",
+                                        fontSize: "14px",
+                                        fontFamily: "MontserratItalic",
+                                    }}
+                                    name="country"
+                                    id="country"
                                     className="country"
-                                />
-                                <FontAwesomeIcon
-                                    className="down"
-                                    icon={faCaretDown}
+                                    valueType="full"
+                                    value={country}
+                                    onChange={(_, e) => {
+                                        setCountry(e.target.value.toLowerCase());
+                                        dispatch(filterByCountry(e.target.value))
+                                        setActiveTab('')
+                                    }}
                                 />
                             </div>
                             <div className="switch">
@@ -227,56 +247,68 @@ const Users = () => {
                 </div>
                 {!show ? (
                     <div className="row">
-                        {(activeTab === "all-users" && input.length === 0 ? results : activeTab !== "all-users" && input.length === 0 ? single_gender : input.length > 0 ? users_by_name : null).slice(indexOfFirstUsers, indexOfLastUsers).map(result => (
-                            <div className="col-12" key={result.phone}>
-                                <div className="card my-4 pl-3 py-4">
-                                    <div className="minicard">
-                                        <img src={result.picture.medium} alt="" />
-                                        <div className="info">
-                                            <h5> {result.name.first} {result.name.last}</h5>
-                                            <p>{result.location.street.number} {result.location.street.name}, {result.location.city}, {result.location.state}</p>
-                                            <div className="contact-info">
-                                                <div className="contact">
-                                                    <p className="email">
-                                                        <span className="mr-2">
-                                                            <FontAwesomeIcon
-                                                                className="envelope"
-                                                                icon={faEnvelope}
-                                                            />
-                                                        </span>{result.email}
-                                                    </p>
-                                                    <p className="phone">
-                                                        <span className="mr-2">
-                                                            <FontAwesomeIcon
-                                                                className="phone"
-                                                                icon={faPhoneVolume}
-                                                            />
-                                                        </span>{result.phone}
-                                                    </p>
-                                                </div>
+                        {(activeTab === "all-users" && input.length === 0 ? results : activeTab !== "all-users" && input.length === 0 && country.length === 0 ? single_gender
+                            : input.length > 0 ? users_by_name
+                                : (activeTab.length === 0 && country.length > 0) ? users_by_country : null).slice(indexOfFirstUsers, indexOfLastUsers).map(result => (
+                                    <div className="col-12" key={result.phone}>
+
+                                        <div className="card my-4 pl-3 py-4">
+                                            <div className="minicard">
+                                                <img src={result.picture.medium} alt="" />
                                                 <div className="info">
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDetails(result.phone)
-                                                        }
-                                                    >
-                                                        <FontAwesomeIcon
-                                                            className="right"
-                                                            icon={faArrowRight}
-                                                        />
-                                                    </button>
+                                                    <h5> {result.name.first} {result.name.last}</h5>
+                                                    <p>{result.location.street.number} {result.location.street.name}, {result.location.city}, {result.location.state}, {result.location.country}</p>
+                                                    <div className="contact-info">
+                                                        <div className="contact">
+                                                            <p className="email">
+                                                                <span className="mr-2">
+                                                                    <FontAwesomeIcon
+                                                                        className="envelope"
+                                                                        icon={faEnvelope}
+                                                                    />
+                                                                </span>{result.email}
+                                                            </p>
+                                                            <p className="phone">
+                                                                <span className="mr-2">
+                                                                    <FontAwesomeIcon
+                                                                        className="phone"
+                                                                        icon={faPhoneVolume}
+                                                                    />
+                                                                </span>{result.phone}
+                                                            </p>
+                                                        </div>
+                                                        
+                                                        <div className="info">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setActiveTab("user-info")
+                                                                    handleDetails(result.phone)
+                                                                }
+                                                                }
+                                                            >
+                                                                <FontAwesomeIcon
+                                                                    className="right"
+                                                                    icon={faArrowRight}
+                                                                />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    {
+
+                                                    }
                                                 </div>
                                             </div>
-
-
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))
+                                ))
                         }
+                        {activeTab === "all-users" && input.length === 0 && results.length === 0 && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
+                        {activeTab !== "all-users" && input.length === 0 && country.length === 0 && single_gender.length === 0 && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
+                        {(input.length > 0 && users_by_name.length === 0) && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
+                        {(country.length > 0 && users_by_country.length === 0) && <h3 className="mx-auto my-5 font-italic">No results found!</h3>}
                     </div>
-                ) : (<SingleUser setShow={setShow} />)}
+                ) : (<SingleUser setShow={setShow} setActiveTab={setActiveTab} />)}
 
 
                 <div className="bottom d-flex justify-content-between my-5">
@@ -639,17 +671,17 @@ const UserContainer = styled.div`
             }
         }
         .card {
-            height: 150px;
+            min-height: 150px;
             border-radius: 10px;
             border: none;
             @media (max-width: 400px) {
                 width: 340px;
-                height: 250px;
+                min-height: 200px;
                 margin-left: 0.5rem;
             }
             @media (max-width: 500px) {
                 width: 340px;
-                height: 250px;
+                min-height: 200px;
                 margin-left: 0.5rem;
             }
             .minicard {
