@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faUsers, faMale, faFemale, faCaretDown, faEnvelope, faPhoneVolume, faArrowRight, faAngleLeft, faAngleRight }
+import {
+    faSearch, faUsers,
+    faMale, faFemale, faCaretDown,
+    faEnvelope, faPhoneVolume,
+    faArrowRight, faAngleLeft,
+    faAngleRight, faCloudDownloadAlt,
+    faMobileAlt, faArrowLeft
+}
     from "@fortawesome/free-solid-svg-icons";
 import styled from 'styled-components';
-import { filterByGender, getAllUsers } from "../state/actions/users";
+import { filterByGender, getAllUsers, filterByName, setDetails } from "../state/actions/users";
 
 import Switch from "react-switch";
 
@@ -18,12 +25,14 @@ const Users = () => {
     const [activeTab, setActiveTab] = useState("all-users");
     const [currentPage, setCurrentPage] = useState(1);
     const [input, setInput] = useState("");
-    const [userPerPage] = useState(3);
     const [activeButton, setActiveButton] = useState("");
+    const [show, setShow] = useState(false);
+    // const [activeUser, setActiveUser] = useState("");
 
 
-    const { results, single_gender } = useSelector((state) => state.users)
 
+    const { results, single_gender, users_by_name, details } = useSelector((state) => state.users)
+    const userPerPage = 3
 
     useEffect(() => {
         dispatch(getAllUsers())
@@ -40,39 +49,68 @@ const Users = () => {
         }
     }
     const indexOfLastUser = currentPage * userPerPage;
-    const indexOfFirstUser = indexOfLastUser - userPerPage;
-    const totalPages = results.length;
 
-    const allResults = results.slice(indexOfFirstUser, indexOfLastUser)
+    const totalPages = Math.ceil(results.length / userPerPage);
 
     const indexOfLastUsers = currentPage * userPerPage;
     const indexOfFirstUsers = indexOfLastUser - userPerPage;
 
-    const genderResults = single_gender.slice(indexOfFirstUsers, indexOfLastUsers)
-
-
     const handleNameInput = (e) => {
         setInput(e.target.value)
+        dispatch(filterByName(e.target.value))
     }
 
     // Next Page
     const increment = () => {
+
         if (currentPage < totalPages) {
             setCurrentPage(currentPage + 1)
         }
     }
+    console.log('current', currentPage, 'totalPages', totalPages)
 
-    // Prev Page
+    // Previous Page
     const decrement = () => {
         if (currentPage > 1) {
             setCurrentPage(currentPage - 1)
         }
+    };
+
+    const handleDetails = (id) => {
+        const detail = results.find(result => result.phone === id)
+        dispatch(setDetails(detail))
+        setShow(!show)
+    };
+
+    const backToResults = () => {
+        // dispatch(dispatch(getAllUsers()))
+        setShow(show)
     }
-
-
 
     const handleChange = (checked) => {
         setChecked(checked)
+    };
+
+    const exportToCvs = () => {
+        var cvsRow = [];
+        var A = [["id", ["first name", "last name"]],]
+        var re = results;
+
+        for (var item = 0; item < results.length; item++) {
+            A.push([item, re[item].name.first], [item, re[item].name.last])
+        }
+        for (var i = 0; i < A.length; ++i) {
+            cvsRow.push(A[i].join(","))
+        }
+        var cvsString = cvsRow.join("%0A");
+
+        var a = document.createElement("a")
+        a.href = 'data:attachment/csv' + cvsString;
+        a.target = "_Blank"
+        a.download = "testfile.csv";
+        document.body.appendChild(a)
+        a.click();
+        console.log(cvsString)
     }
     return (
         <UserContainer className="row">
@@ -93,6 +131,7 @@ const Users = () => {
                         type="text"
                         value={input}
                         onChange={handleNameInput}
+                        data-testid="filter-input"
                         placeholder=" Find a user"
                     />
 
@@ -100,7 +139,7 @@ const Users = () => {
                 <div className="show-users my-5">
                     <h6 className="users">Show Users</h6>
                     <div className="filter-icons py-3">
-                        <div className="wrap">
+                        <section className={activeTab ==="all-users" ? "activeTab" : ""}>
                             <button
                                 className="users"
                                 data-testid='users'
@@ -113,8 +152,8 @@ const Users = () => {
                                 />
                             </button>
                             <p className="title">All Users</p>
-                        </div>
-                        <div className="wrap">
+                        </section>
+                        <section className={activeTab ==="male-users" ? "activeTab" : ""}>
                             <button
                                 className="male"
                                 onClick={() => handleBtns('male-users')}
@@ -125,8 +164,8 @@ const Users = () => {
                                 />
                             </button>
                             <p className="title">Male Users</p>
-                        </div>
-                        <div className="wrap">
+                        </section>
+                        <section className={activeTab ==="female-users" ? "activeTab" : ""}>
                             <button
                                 className="female"
                                 onClick={() =>
@@ -138,7 +177,7 @@ const Users = () => {
                                 />
                             </button>
                             <p className="title">Female Users</p>
-                        </div>
+                        </section>
                     </div>
                 </div>
             </div>
@@ -165,6 +204,7 @@ const Users = () => {
                                 <input
                                     type="text"
                                     placeholder=" Find in a list"
+                                    disabled
                                 />
                             </div>
                             <div className="country-search">
@@ -186,53 +226,121 @@ const Users = () => {
 
                     </div>
                 </div>
-                <div className="row">
-                    {(activeTab === "all-users" ? allResults : activeTab !== "all-users" ? genderResults : null).map(result => (
-                        <div className="col-12" key={result.phone}>
-                            <div className="card my-3 pl-3 py-3">
-                                <div className="minicard">
-                                    <img src={result.picture.medium} alt="" />
-                                    <div className="info">
-                                        <h5>{result.name.first} {result.name.last}</h5>
-                                        <p>{result.location.street.number} {result.location.street.name}, {result.location.city}, {result.location.state}</p>
-                                        <div className="contact-info">
-                                            <div className="contact">
-                                                <p className="email">
-                                                    <span className="mr-2">
+                {!show ? (
+                    <div className="row">
+                        {(activeTab === "all-users" && input.length === 0 ? results : activeTab !== "all-users" && input.length === 0 ? single_gender : input.length > 0 ? users_by_name : null).slice(indexOfFirstUsers, indexOfLastUsers).map(result => (
+                            <div className="col-12" key={result.phone}>
+                                <div className="card my-4 pl-3 py-4">
+                                    <div className="minicard">
+                                        <img src={result.picture.medium} alt="" />
+                                        <div className="info">
+                                            <h5> {result.name.first} {result.name.last}</h5>
+                                            <p>{result.location.street.number} {result.location.street.name}, {result.location.city}, {result.location.state}</p>
+                                            <div className="contact-info">
+                                                <div className="contact">
+                                                    <p className="email">
+                                                        <span className="mr-2">
+                                                            <FontAwesomeIcon
+                                                                className="envelope"
+                                                                icon={faEnvelope}
+                                                            />
+                                                        </span>{result.email}
+                                                    </p>
+                                                    <p className="phone">
+                                                        <span className="mr-2">
+                                                            <FontAwesomeIcon
+                                                                className="phone"
+                                                                icon={faPhoneVolume}
+                                                            />
+                                                        </span>{result.phone}
+                                                    </p>
+                                                </div>
+                                                <div className="info">
+                                                    <button
+                                                        onClick={() =>
+                                                            handleDetails(result.phone)
+                                                        }
+                                                    >
                                                         <FontAwesomeIcon
-                                                            className="envelope"
-                                                            icon={faEnvelope}
+                                                            className="right"
+                                                            icon={faArrowRight}
                                                         />
-                                                    </span>{result.email}
-                                                </p>
-                                                <p className="phone">
-                                                    <span className="mr-2">
-                                                        <FontAwesomeIcon
-                                                            className="phone"
-                                                            icon={faPhoneVolume}
-                                                        />
-                                                    </span>{result.phone}
-                                                </p>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div className="info">
-                                                <button>
-                                                    <FontAwesomeIcon
-                                                        className="right"
-                                                        icon={faArrowRight}
-                                                    />
-                                                </button>
-                                            </div>
-                                        </div>
 
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))
+                        }
+                    </div>
+                ) : (
+                        <div className="row py-5">
+                            <div className="col-12">
+                                <button
+                                    onClick={() =>
+                                        backToResults()
+                                    }
+                                    className="back">
+                                    <FontAwesomeIcon
+                                        className="left"
+                                        icon={faArrowLeft}
+                                    />
+                                    RESULTS
+                                </button>
+                                <div className="box d-flex py-5">
+                                    <img src={details?.picture?.large} alt="" />
+                                    <div className="info my-3">
+                                        <h4> {details?.name?.title} {details?.name?.first}, {details?.name?.last}, <span>{details?.dob?.age}</span></h4>
+                                        <p>{details?.location?.street?.number} {details?.location?.street?.name} {details?.location?.city} {details?.location?.state}</p>
+                                        <p className="email pl-3 mr-5">
+                                            <span className="mr-2">
+                                                <FontAwesomeIcon
+                                                    className="envelope"
+                                                    icon={faEnvelope}
+                                                />
+                                            </span>{details.email}
+                                        </p>
+                                        <p className="joined pl-3">JOINED: {details?.registered?.date}</p>
+                                        <p className="phone">
+                                            <span className="mr-2">
+                                                <FontAwesomeIcon
+                                                    className="phone"
+                                                    icon={faPhoneVolume}
+                                                />
+                                            </span>{details.phone}
+                                        </p>
+                                        <p className="phone">
+                                            <span className="mr-2">
+                                                <FontAwesomeIcon
+                                                    className="phone"
+                                                    icon={faMobileAlt}
+                                                />
+                                            </span>{details.phone}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    ))
-                    }
-                </div>
-                <div className="bottom d-flex justify-content-between">
-                    <button>button</button>
+                    )}
+
+
+                <div className="bottom d-flex justify-content-between my-5">
+                    <button
+                        className="download"
+                        onClick={() =>
+                            exportToCvs()
+                        }
+                    >
+                        <FontAwesomeIcon
+                            style={{ marginRight: "0.5rem" }}
+                            icon={faCloudDownloadAlt}
+                        />
+                        Download results
+                        </button>
                     <div className="prev-next">
                         <button
 
@@ -324,16 +432,17 @@ const UserContainer = styled.div`
       }
       .filter-icons {
           display: flex;
+          width: 70%;
+          justify-content: space-between;
           margin-top: 1rem;
           align-items: center;
-          .wrap {
+          section {
             transition: all 1s linear;
-          }
-          .wrap:hover {
-              transform: scale(1.2);
+            &.activeTab {
+                transform: scale(1.2);
+            }
           }
           .users {
-              margin-right: 1.5rem;
               background: var(--mainPink);
               color: #FFFFFF;
               border: none;
@@ -344,7 +453,6 @@ const UserContainer = styled.div`
               opacity: 1;
           }
           .male {
-              margin-right: 1.5rem;
               background: var(--mainGreen);
               color: #FFFFFF;
               border: none;
@@ -355,7 +463,6 @@ const UserContainer = styled.div`
               opacity: 1;
           }
           .female {
-              margin-right: 1.5rem;
               background: var(--fairPurple);
               color: #FFFFFF;
               border: none;
@@ -370,6 +477,7 @@ const UserContainer = styled.div`
              opacity: 0.7;
              font-size: 10px;
              margin-top: 1rem;
+             text-align: center;
           }
         }
     }
@@ -528,6 +636,67 @@ const UserContainer = styled.div`
             }
             
         }
+        }
+        .back {
+            background: none;
+            border: none;
+            outline: none;
+            opacity: 1;
+            font-size: 14px;
+            color: var(--lightDark) !important;
+            .left {
+                color: var(--mainGreen);
+                margin-right: 0.6rem;
+                font-size: 1.2rem;
+                padding-top: 2px;
+            }
+        }
+        .box {
+            img {
+                width: 160px;
+                height: 170px;
+                border-radius: 50%;
+                border: 5px solid var(--mainGreen);
+            }
+            .info{
+                margin-left: 2rem;
+                h4 {
+                    color: var(--darkPurple);
+                    font-family: PoppinsBold;
+                    opacity: 1;
+                    span {
+                        opacity: 0.4;
+                        font-weight: lighter;
+                    }
+                }
+                .email{
+                   background: var(--lighterWhite);
+                   padding: 0.5rem;
+                   border-radius: 30px;
+                   opacity: 1; 
+                }
+                .joined {
+                    background: var(--lightPink);
+                    border-radius: 30px;
+                    padding: 0.8rem;
+                    font-size: 12px;
+                    font-weight: bolder;
+                    margin-right: 7rem;
+                }
+                .phone {
+                    font-size: 12px;
+                }
+            }
+        }
+        .download {
+            border:none;
+            background: var(--fairPurple);
+            border-radius: 30px;
+            width: 30%;
+            height: 45px;
+            outline: none;
+            color: #ffffff;
+            font-size: 14px;
         }
         .prev-next {
             display: flex;

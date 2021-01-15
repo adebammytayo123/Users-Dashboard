@@ -16,6 +16,20 @@ export const filterByGender = (payload) => {
     payload,
   };
 };
+
+export const filterByName = (payload) => {
+  return {
+    type: types.FILTER_BY_NAME,
+    payload,
+  };
+};
+export const setDetails = (payload) => {
+  return {
+    type: types.SET_DETAILS,
+    payload,
+  };
+};
+
 export const getAllUsers = () => async (dispatch) => {
   await axios.get(`https://randomuser.me/api/?results=50`)
     .then(({ data }) => {
