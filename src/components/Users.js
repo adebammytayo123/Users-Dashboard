@@ -108,9 +108,7 @@ const Users = () => {
         a.download = "testfile.csv";
         document.body.appendChild(a)
         a.click();
-        console.log(cvsString)
     }
-    console.log('users by ountry', users_by_country, activeTab.length === 0 && country.length > 0)
     return (
         <UserContainer className="row">
             <div className="first-section col-sm-12 col-lg-5">
