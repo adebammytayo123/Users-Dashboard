@@ -241,7 +241,8 @@ const Users = () => {
         </div>
         {!show ? (
           <div className="row">
-            {(activeTab === "all-users" && input.length === 0
+            {
+            (activeTab === "all-users" && input.length === 0
               ? results
               : activeTab !== "all-users" &&
                 input.length === 0 &&
