@@ -314,8 +314,9 @@ const Users = () => {
                                 </p>
                               </div>
                               <div className="info">
+
                                 <button
-                                  className="details"
+                                  className={activeTab === "all-users" ? "details" : activeTab === "male-users" ? "male" : "female"}
                                   onClick={() => {
                                     setActiveTab("user-info");
                                     handleDetails(result.phone);

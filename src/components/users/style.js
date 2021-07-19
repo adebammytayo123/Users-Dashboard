@@ -317,12 +317,29 @@ export const UserContainer = styled.div`
           }
           .info {
             margin-top: 1rem;
-            margin-left: -0.5rem;
-            float: right;
+            margin-left: 0;
             .details {
               width: 2.5rem;
               height: 2.5rem;
-              background: var(--normalGreen) !important;
+              background: var(--mainPink) !important;
+              border: none;
+              border-radius: 10px;
+              color: #ffffff;
+              outline: none;
+            }
+            .male {
+              width: 2.5rem;
+              height: 2.5rem;
+              background: var(--darkGreen) !important;
+              border: none;
+              border-radius: 10px;
+              color: #ffffff;
+              outline: none;
+            }
+            .female {
+              width: 2.5rem;
+              height: 2.5rem;
+              background: var(--fairPurple) !important;
               border: none;
               border-radius: 10px;
               color: #ffffff;
