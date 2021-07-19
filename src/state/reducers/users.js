@@ -17,6 +17,7 @@ export default function bodyReducer(state = initialState, action) {
         ...state,
         results: [...action.payload]
       };
+
     case types.ONE_GENDER:
       return {
         ...state,
@@ -39,25 +40,26 @@ export default function bodyReducer(state = initialState, action) {
         users_by_name: [...newArr]
 
       };
-    case types.FILTER_BY_COUNTRY:
 
+    case types.FILTER_BY_COUNTRY:
       return {
         ...state,
         users_by_country: state.results.filter(user => 
           user.location.country?.toLowerCase()?.includes(action.payload?.toLowerCase())
         )
       }
-      case types.SET_DETAILS:
-        return {
-          ...state,
-          details: action.payload
-        };
+
+    case types.SET_DETAILS:
+      return {
+        ...state,
+        details: action.payload
+      };
     case types.LOADING: {
       return {
         ...state,
         loading:action.payload
       }
-        }
+    }
 
     default:
       return state;

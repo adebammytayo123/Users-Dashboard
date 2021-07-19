@@ -49,6 +49,7 @@ export const getAllUsers = () => async (dispatch) => {
     .then(({ data }) => {
       dispatch(setLoading(false))
       dispatch(getUsers(data.results))
+      console.log("sol", data.results)
     })
     .catch((err) => {
       dispatch(setLoading(false))

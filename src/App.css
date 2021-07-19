@@ -16,6 +16,8 @@
   --mainGrey: #3C3F54;
   --lighterWhite: #E2E2EA;
   --normalGreen: #30BBB5;
+  --mainRed: #f07067;
+  --mainBlue: #3aafd3;
 }
 
 html {
@@ -25,9 +27,8 @@ html {
 
 
 body {
-  background: var(--darkPurple);
+  background: var(--darkPurple) !important;
   overflow-x: hidden;
-  width: 100%
 }
 
 @font-face {
